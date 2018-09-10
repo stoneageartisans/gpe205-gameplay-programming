@@ -5,20 +5,15 @@ using UnityEngine;
 public class TankData : MonoBehaviour
 {
     [HideInInspector]
-    public float moveSpeed;
+    public string ownerName;
 
     [HideInInspector]
-    public float rateOfFire;
-
-    [HideInInspector]
-    public  float turnSpeed;
+    public int health;
 
     // Use this for initialization
     void Start()
     {
-        moveSpeed = GameManager.instance.tankMoveSpeed;
-        rateOfFire = GameManager.instance.tankRateOfFire;
-        turnSpeed = GameManager.instance.tankTurnSpeed;
+        health = GameManager.instance.tankStartingHealth;
     }
 
     // Update is called once per frame

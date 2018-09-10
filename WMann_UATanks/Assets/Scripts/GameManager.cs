@@ -6,14 +6,18 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    public float missileLife = 3; // in seconds
-    public float missileSpeed = 100; // in meters per second
-    public float tankMoveSpeed = 3; // in meters per second
-    public float tankRateOfFire = 0.25F; // in shots per second
-    public float tankTurnSpeed = 180; // in degrees per second
+    public float missileLife = 3;
+    public int missileMinDamage = 3;
+    public int missileMaxDamage = 7;
+    public float missileSpeed = 10;
+    public float tankMoveSpeed = 3;
+    public float tankCannonDelay = 2;
+    public int tankStartingHealth = 10;
+    public float tankTurnSpeed = 180;
 
-    public GameObject missile;
-    public GameObject playerTank;    
+    public GameObject aiTankPrefab;
+    public GameObject missilePrefab;
+    public GameObject playerTankPrefab;    
 
     void Awake()
     {
@@ -32,7 +36,12 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         // Spawns the player's tank
-        Instantiate(playerTank);
+        GameObject playerTank = Instantiate(playerTankPrefab);
+        playerTank.GetComponent<TankData>().ownerName = "Player";
+
+        // Spawn an AI tank
+        GameObject aiTank = Instantiate(aiTankPrefab);
+        aiTank.transform.position = new Vector3(10, aiTank.transform.position.y, 10);
     }
 
     // Update is called once per frame
