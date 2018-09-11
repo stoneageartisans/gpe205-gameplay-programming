@@ -114,8 +114,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1.1, y: 0.8, z: 1.1}
-  m_Center: {x: 0, y: 0, z: -0.075}
+  m_Size: {x: 1.1, y: 0.8, z: 1.3}
+  m_Center: {x: 0, y: 0, z: -0.05}
 --- !u!114 &114348487052292696
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -162,6 +162,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ownerName: 
+  health: 0
 --- !u!143 &143799584532669258
 CharacterController:
   m_ObjectHideFlags: 1
@@ -172,13 +173,13 @@ CharacterController:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Height: 0.5
-  m_Radius: 0.5
-  m_SlopeLimit: 45
+  m_Height: 1
+  m_Radius: 1
+  m_SlopeLimit: 0
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: -0.075}
+  m_Center: {x: 0, y: 0, z: -0.05}
 --- !u!212 &212297547246259578
 SpriteRenderer:
   m_ObjectHideFlags: 1

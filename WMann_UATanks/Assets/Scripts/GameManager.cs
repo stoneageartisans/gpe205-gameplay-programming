@@ -42,6 +42,10 @@ public class GameManager : MonoBehaviour
         // Spawn an AI tank
         GameObject aiTank = Instantiate(aiTankPrefab);
         aiTank.transform.position = new Vector3(10, aiTank.transform.position.y, 10);
+
+        // Spawn an AI tank
+        GameObject aiTank2 = Instantiate(aiTankPrefab);
+        aiTank2.transform.position = new Vector3(-5, aiTank2.transform.position.y, -10);
     }
 
     // Update is called once per frame
