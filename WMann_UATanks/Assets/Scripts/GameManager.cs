@@ -17,7 +17,9 @@ public class GameManager : MonoBehaviour
 
     public GameObject aiTankPrefab;
     public GameObject missilePrefab;
-    public GameObject playerTankPrefab;    
+    public GameObject playerTankPrefab;
+
+    public Transform[] waypoints;
 
     void Awake()
     {
@@ -42,10 +44,12 @@ public class GameManager : MonoBehaviour
         // Spawn an AI tank
         GameObject aiTank = Instantiate(aiTankPrefab);
         aiTank.transform.position = new Vector3(10, aiTank.transform.position.y, 10);
+        aiTank.GetComponent<TankData>().ownerName = aiTank.name;
 
         // Spawn an AI tank
         GameObject aiTank2 = Instantiate(aiTankPrefab);
         aiTank2.transform.position = new Vector3(-5, aiTank2.transform.position.y, -10);
+        aiTank2.GetComponent<TankData>().ownerName = aiTank2.name;
     }
 
     // Update is called once per frame

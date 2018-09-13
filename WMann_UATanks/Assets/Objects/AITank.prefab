@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 65439879635601498}
   - component: {fileID: 114433041210270498}
   - component: {fileID: 114405141146822502}
+  - component: {fileID: 114128579480160120}
   m_Layer: 0
   m_Name: AITank
   m_TagString: Untagged
@@ -69,7 +70,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1728238931181672}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.55, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4894119483787720}
@@ -115,6 +116,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.1, y: 0.8, z: 1.3}
   m_Center: {x: 0, y: 0, z: -0.05}
+--- !u!114 &114128579480160120
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1728238931181672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e1249f3405774e468fe7f42946189c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  waypointPrecision: 1
 --- !u!114 &114269027655078728
 MonoBehaviour:
   m_ObjectHideFlags: 1
