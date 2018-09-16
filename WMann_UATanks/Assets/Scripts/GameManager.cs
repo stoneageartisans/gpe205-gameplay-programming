@@ -42,19 +42,27 @@ public class GameManager : MonoBehaviour
         playerTank.GetComponent<TankData>().ownerName = "Player";
 
         // Spawn an AI tank
-        GameObject aiTank = Instantiate(aiTankPrefab);
-        aiTank.transform.position = new Vector3(10, aiTank.transform.position.y, 10);
-        aiTank.GetComponent<TankData>().ownerName = aiTank.name;
-
+        CreateEnemy("Enemy01", 10, 10, AiController.WaypointTraverseType.Random, true);
+        
         // Spawn an AI tank
-        GameObject aiTank2 = Instantiate(aiTankPrefab);
+        /*GameObject aiTank2 = Instantiate(aiTankPrefab);
         aiTank2.transform.position = new Vector3(-5, aiTank2.transform.position.y, -10);
         aiTank2.GetComponent<TankData>().ownerName = aiTank2.name;
+        aiTank2.GetComponent<AiController>().waypointTraverseType = AiController.WaypointTraverseType.Random;*/
     }
 
     // Update is called once per frame
     void Update()
     {
+        // TODO
+    }
 
+    void CreateEnemy(string name, float x, float z, AiController.WaypointTraverseType traverseType, bool patrolContinuously)
+    {
+        GameObject aiTank = Instantiate(aiTankPrefab);
+        aiTank.transform.position = new Vector3(x, aiTank.transform.position.y, z);
+        aiTank.GetComponent<TankData>().ownerName = name;
+        aiTank.GetComponent<AiController>().waypointTraverseType = traverseType;
+        aiTank.GetComponent<AiController>().continuousTraversal = patrolContinuously;
     }
 }

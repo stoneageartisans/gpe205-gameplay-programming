@@ -32,7 +32,7 @@ public class Missile : MonoBehaviour
         if(collider.name.ToLower().Contains("tank"))
         {
             // Report the missile's owner
-            Debug.Log(ownerName + "'s missile hit " + collider.name);
+            Debug.Log(ownerName + "'s missile hit " + collider.GetComponent<TankData>().ownerName);
 
             // Do damage to hit tank
             DamageTank(collider);
@@ -45,6 +45,6 @@ public class Missile : MonoBehaviour
         collider.GetComponent<TankData>().health -= Random.Range(GameManager.instance.missileMinDamage, GameManager.instance.missileMaxDamage);
 
         // Report damage
-        Debug.Log(collider.name + "'s health is now " + collider.GetComponent<TankData>().health);
+        Debug.Log(collider.GetComponent<TankData>().ownerName + "'s health is now " + collider.GetComponent<TankData>().health);
     }
 }
