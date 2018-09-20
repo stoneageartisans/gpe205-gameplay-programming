@@ -32,11 +32,11 @@ public class InputController : MonoBehaviour
             case InputScheme.WASD:
                 if(Input.GetKey(KeyCode.W))
                 {
-                    tankMotor.Move(GameManager.instance.tankMoveSpeed);
+                    tankMotor.Move(GameManager.instance.playerMoveSpeed);
                 }
                 if(Input.GetKey(KeyCode.S))
                 {
-                    tankMotor.Move(-GameManager.instance.tankMoveSpeed);
+                    tankMotor.Move(-GameManager.instance.playerMoveSpeed);
                 }
                 if(Input.GetKey(KeyCode.D))
                 {
@@ -54,11 +54,11 @@ public class InputController : MonoBehaviour
             case InputScheme.arrowKeys:
                 if(Input.GetKey(KeyCode.UpArrow))
                 {
-                    tankMotor.Move(GameManager.instance.tankMoveSpeed);
+                    tankMotor.Move(GameManager.instance.playerMoveSpeed);
                 }
                 if(Input.GetKey(KeyCode.DownArrow))
                 {
-                    tankMotor.Move(-GameManager.instance.tankMoveSpeed);
+                    tankMotor.Move(-GameManager.instance.playerMoveSpeed);
                 }
                 if(Input.GetKey(KeyCode.RightArrow))
                 {

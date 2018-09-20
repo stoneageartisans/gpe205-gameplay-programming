@@ -10,7 +10,8 @@ public class GameManager : MonoBehaviour
     public int missileMinDamage = 3;
     public int missileMaxDamage = 7;
     public float missileSpeed = 10;
-    public float tankMoveSpeed = 3;
+    public float playerMoveSpeed = 3;
+    public float enemyMoveSpeed = 2.5f;
     public float tankCannonDelay = 2;
     public int tankStartingHealth = 10;
     public float tankTurnSpeed = 180;
@@ -20,6 +21,15 @@ public class GameManager : MonoBehaviour
     public GameObject playerTankPrefab;
 
     public Transform[] waypoints;
+
+    [HideInInspector]
+    public GameObject playerTank;
+
+    [HideInInspector]
+    public Transform playerTransform;
+
+    private Vector3 cameraOffset;
+    private Transform cameraTransform;
 
     void Awake()
     {
@@ -37,32 +47,46 @@ public class GameManager : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        // Spawns the player's tank
-        GameObject playerTank = Instantiate(playerTankPrefab);
+        // Create the player's tank
+        playerTank = Instantiate(playerTankPrefab);
         playerTank.GetComponent<TankData>().ownerName = "Player";
+        playerTransform = playerTank.GetComponent<Transform>();
 
-        // Spawn an AI tank
-        CreateEnemy("Enemy01", 10, 10, AiController.WaypointTraverseType.Random, true);
-        
-        // Spawn an AI tank
-        /*GameObject aiTank2 = Instantiate(aiTankPrefab);
-        aiTank2.transform.position = new Vector3(-5, aiTank2.transform.position.y, -10);
-        aiTank2.GetComponent<TankData>().ownerName = aiTank2.name;
-        aiTank2.GetComponent<AiController>().waypointTraverseType = AiController.WaypointTraverseType.Random;*/
+        // Initialize some values for the camera to follow the player
+        cameraTransform = Camera.main.GetComponent<Transform>();
+        cameraOffset = cameraTransform.position - playerTransform.position;
     }
 
     // Update is called once per frame
     void Update()
     {
-        // TODO
+        // Set the position of the camera to be the same as the player's plus offset
+        cameraTransform.position = playerTransform.position + cameraOffset;
     }
 
-    void CreateEnemy(string name, float x, float z, AiController.WaypointTraverseType traverseType, bool patrolContinuously)
+    /*
+    void CreateEnemy(string name, float x, float z, AiController.PatrolType _patrolType, bool _continuousPatrolling)
     {
         GameObject aiTank = Instantiate(aiTankPrefab);
         aiTank.transform.position = new Vector3(x, aiTank.transform.position.y, z);
         aiTank.GetComponent<TankData>().ownerName = name;
-        aiTank.GetComponent<AiController>().waypointTraverseType = traverseType;
-        aiTank.GetComponent<AiController>().continuousTraversal = patrolContinuously;
+
+        AiController aiController = aiTank.GetComponent<AiController>();
+        aiController.patrolType = _patrolType;
+        aiController.continuousPatrolling = _continuousPatrolling;
+        aiController.attackMode = AiController.AttackMode.None;
     }
+
+    void CreateEnemy(string name, float x, float z, AiController.AttackMode _attackMode)
+    {
+        GameObject aiTank = Instantiate(aiTankPrefab);
+        aiTank.transform.position = new Vector3(x, aiTank.transform.position.y, z);
+        aiTank.GetComponent<TankData>().ownerName = name;
+
+        AiController aiController = aiTank.GetComponent<AiController>();
+        aiController.patrolType = AiController.PatrolType.None;
+        aiController.continuousPatrolling = false;
+        aiController.attackMode = _attackMode;
+    }
+    */
 }

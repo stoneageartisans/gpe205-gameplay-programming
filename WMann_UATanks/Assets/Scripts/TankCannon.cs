@@ -6,11 +6,13 @@ public class TankCannon : MonoBehaviour
 {
     private bool ready;
     private float nextReadyTime;
+    private Transform _transform;
 
     // Use this for initialization
     void Start()
     {
         ready = true;
+        _transform = gameObject.GetComponent<Transform>();
     }
 
     // Update is called once per frame
@@ -32,7 +34,7 @@ public class TankCannon : MonoBehaviour
         if(ready)
         {
             // Spawns a missile that moves in the direction the tank is pointing
-            GameObject missile = Instantiate(GameManager.instance.missilePrefab, gameObject.transform.position, gameObject.transform.rotation);
+            GameObject missile = Instantiate(GameManager.instance.missilePrefab, _transform.position, _transform.rotation);
 
             // Set the missile's owner
             missile.GetComponent<Missile>().ownerName = ownerName;

@@ -41,7 +41,7 @@ GameObject:
   - component: {fileID: 4894119483787720}
   - component: {fileID: 212801884361800766}
   m_Layer: 0
-  m_Name: tank_red
+  m_Name: sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -127,6 +127,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e1249f3405774e468fe7f42946189c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  personality: 1
+  avoidanceDuration: 2
+  continuousPatrolling: 1
+  fleeDistance: 1
+  patrolType: 0
+  targetProximity: 3
   waypointPrecision: 1
 --- !u!114 &114269027655078728
 MonoBehaviour:

@@ -1,0 +1,22 @@
+AI Tank Personalities
+---------------------
+
+Cautious:
+
+When the player is encountered, the AI will pursue the player if the AI health is greater than half,
+otherwise it will flee from the player.
+
+
+Cowardly:
+
+When the player is encountered, the AI will flee flee the player.
+
+
+Erratic:
+
+When the player is encountered, the AI will randomly pursue the player or flee from the player.
+
+
+Overconfident:
+
+When the player is encountered, the AI will pursue the player.
