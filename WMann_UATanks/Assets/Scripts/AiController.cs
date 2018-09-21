@@ -17,7 +17,8 @@ public class AiController : MonoBehaviour
         Avoidance,
         Flee,
         Patrol,
-        Pursue
+        Pursue,
+        Stop
     };
 
     public enum PatrolType
@@ -65,103 +66,69 @@ public class AiController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(currentMode == Mode.Patrol)
+        if(TargetDetected())
         {
-            // If we are close to the waypoint
-            if(InProximityOfTarget(waypointPrecision))
+            // Determine action based on personality
+            switch(personality)
             {
-                // Advance waypoint
-                currentWaypoint ++;
-
-                // Set the tank to rotate
-                rotating = true;
-
-                // If all waypoints have been traversed
-                if(currentWaypoint == waypointList.Count)
-                {
-                    if(continuousPatrolling)
-                    {
-                        // Reset back to the beginning
-                        currentWaypoint = 0;
-
-                        // Shuffle the waypoints
-                        if(patrolType == PatrolType.Random)
-                        {
-                            ShuffleList(waypointList);
-                        }
-                    }
-                    else // Stop
-                    {
-                        rotating = false;
-                    }
-                }
-
-                // Set the new target
-                target = GameManager.instance.waypoints[waypointList[currentWaypoint]];
-            }
-
-            if(rotating)
-            {
-                // Rotate towards the target
-                rotating = tankMotor.RotateTowards(target.position, GameManager.instance.tankTurnSpeed);
-            }
-            else
-            {
-                if(CanMove(direction * GameManager.instance.enemyMoveSpeed))
-                {
-                    // Move forward
-                    tankMotor.Move(GameManager.instance.enemyMoveSpeed);
-                }
-                else
-                {
+                case Personality.Overconfident:
                     previousMode = currentMode;
-                    currentMode = Mode.Avoidance;
-                    avoidanceStage = 1;
-                }
+                    currentMode = Mode.Pursue;
+                    break;
+                case Personality.Cowardly:
+                    previousMode = currentMode;
+                    currentMode = Mode.Flee;
+                    break;
+                case Personality.Cautious:
+                    // Check health
+                    if(tankData.health > (GameManager.instance.tankStartingHealth / 2))
+                    {
+                        // Still good
+                        previousMode = currentMode;
+                        currentMode = Mode.Pursue;
+                    }
+                    else
+                    {
+                        // Hurting
+                        previousMode = currentMode;
+                        currentMode = Mode.Flee;
+                    }
+                    break;
+                case Personality.Erratic:
+                    // Flip a coin - 1 is Heads, 2 is Tails
+                    if(Random.Range(1, 2) == 1)
+                    {
+                        // Heads
+                        previousMode = currentMode;
+                        currentMode = Mode.Pursue;
+                    }
+                    else
+                    {
+                        // Tails
+                        previousMode = currentMode;
+                        currentMode = Mode.Flee;
+                    }
+                    break;
             }
         }
-        else
+
+        switch(currentMode)
         {
-            if(currentMode == Mode.Avoidance)
-            {
+            case Mode.Avoidance:
                 AvoidObstacle();
-            }
-            else
-            {
-                // Determine action based on personality
-                switch(personality)
-                {
-                    case Personality.Overconfident:
-                        PursueTarget();
-                        break;
-                    case Personality.Cowardly:
-                        FleeTarget();
-                        break;
-                    case Personality.Cautious:
-                        if(tankData.health > (GameManager.instance.tankStartingHealth / 2))
-                        {
-                            PursueTarget();
-                        }
-                        else
-                        {
-                            FleeTarget();
-                        }    
-                        break;
-                    case Personality.Erratic:
-                        // Flip a coin - 1 is Heads, 2 is Tails
-                        if(Random.Range(1, 2) == 1)
-                        {
-                            // Heads
-                            PursueTarget();
-                        }
-                        else
-                        {
-                            // Tails
-                            FleeTarget();
-                        }
-                        break;
-                }
-            }
+                break;
+            case Mode.Flee:
+                FleeTarget();
+                break;
+            case Mode.Patrol:
+                Patrol();
+                break;
+            case Mode.Pursue:
+                PursueTarget();
+                break;
+            case Mode.Stop:
+                // Do nothing
+                break;
         }
     }
 
@@ -187,7 +154,7 @@ public class AiController : MonoBehaviour
                     waypointList.Add(i);
                 }
                 // Add the waypoints in reverse order (omitting the "pivot" waypoint)
-                for(int i = GameManager.instance.waypoints.Length - 2; i > -1; i --)
+                for(int i = GameManager.instance.waypoints.Length - 2; i > (-1); i--)
                 {
                     waypointList.Add(i);
                 }
@@ -210,8 +177,17 @@ public class AiController : MonoBehaviour
     {
         if(avoidanceStage == 1)
         {
-            // Rotate left
-            tankMotor.Rotate(-GameManager.instance.tankTurnSpeed);
+            switch(Random.Range(1, 2))
+            {
+                // Rotate left
+                case 1:
+                    tankMotor.Rotate(-GameManager.instance.tankTurnSpeed);
+                    break;
+                // Rotate left
+                case 2:
+                    tankMotor.Rotate(GameManager.instance.tankTurnSpeed);
+                    break;
+            }
 
             // If the tank can move, change to stage 2
             if(CanMove(direction * GameManager.instance.enemyMoveSpeed))
@@ -256,7 +232,7 @@ public class AiController : MonoBehaviour
         RaycastHit hit;
 
         // If the raycast hit something...
-        if(Physics.Raycast(_transform.position, (direction * _transform.forward), out hit, (speed * 2)))
+        if(Physics.Raycast(_transform.position, (direction * _transform.forward), out hit, (speed * 3)))
         {
             // ...then the tank can't move.
             result = false;
@@ -270,6 +246,13 @@ public class AiController : MonoBehaviour
         }
 
         return result;
+    }
+
+    void EnterAvoidanceMode()
+    {
+        previousMode = currentMode;
+        currentMode = Mode.Avoidance;
+        avoidanceStage = 1;
     }
 
     void FleeTarget()
@@ -289,9 +272,75 @@ public class AiController : MonoBehaviour
             }
             else
             {
-                previousMode = currentMode;
-                currentMode = Mode.Avoidance;
-                avoidanceStage = 1;
+                EnterAvoidanceMode();
+            }
+        }
+    }
+
+    // Determines whether or not the tank is within the specified distance to the current target
+    bool InProximityOfTarget(float distance)
+    {
+        return (Vector3.SqrMagnitude(target.position - _transform.position) < (distance * distance));
+    }
+
+    void Patrol()
+    {
+        // Set the target
+        target = GameManager.instance.waypoints[waypointList[currentWaypoint]];
+
+        // If we are close to the waypoint
+        if(InProximityOfTarget(waypointPrecision))
+        {
+            // Advance waypoint
+            currentWaypoint ++;
+
+            // Set the tank to rotate
+            rotating = true;
+
+            // If all waypoints have been traversed
+            if(currentWaypoint == waypointList.Count)
+            {
+                if(continuousPatrolling)
+                {
+                    // Reset back to the beginning
+                    currentWaypoint = 0;
+
+                    // Shuffle the waypoints
+                    if(patrolType == PatrolType.Random)
+                    {
+                        ShuffleList(waypointList);
+                    }
+                }
+                else // Stop
+                {
+                    currentMode = Mode.Stop;
+                    rotating = false;
+                }
+            }
+
+            // Set the new target
+            target = GameManager.instance.waypoints[waypointList[currentWaypoint]];
+        }
+
+        if(rotating)
+        {
+            // Rotate towards the target
+            rotating = tankMotor.RotateTowards(target.position, GameManager.instance.tankTurnSpeed);
+        }
+        else
+        {
+            // If still patrolling
+            if(currentMode == Mode.Patrol)
+            {
+                if(CanMove(direction * GameManager.instance.enemyMoveSpeed))
+                {
+                    // Move forward
+                    tankMotor.Move(GameManager.instance.enemyMoveSpeed);
+                }
+                else
+                {
+                    EnterAvoidanceMode();
+                }
             }
         }
     }
@@ -314,9 +363,7 @@ public class AiController : MonoBehaviour
             }
             else
             {
-                previousMode = currentMode;
-                currentMode = Mode.Avoidance;
-                avoidanceStage = 1;
+                EnterAvoidanceMode();
             }
         }
     }
@@ -344,9 +391,9 @@ public class AiController : MonoBehaviour
         }        
     }
 
-    // Determines whether or not the tank is within the specified distance to the current target
-    bool InProximityOfTarget(float distance)
+    bool TargetDetected()
     {
-        return (Vector3.SqrMagnitude(target.position - _transform.position) < (distance * distance));
+        // TODO
+        return false;
     }
 }
