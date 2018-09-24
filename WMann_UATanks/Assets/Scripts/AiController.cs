@@ -232,7 +232,7 @@ public class AiController : MonoBehaviour
         RaycastHit hit;
 
         // If the raycast hit something...
-        if(Physics.Raycast(_transform.position, (direction * _transform.forward), out hit, (speed * 3)))
+        if(Physics.Raycast(_transform.position, (direction * _transform.forward), out hit, speed))
         {
             // ...then the tank can't move.
             result = false;
@@ -317,9 +317,6 @@ public class AiController : MonoBehaviour
                     rotating = false;
                 }
             }
-
-            // Set the new target
-            target = GameManager.instance.waypoints[waypointList[currentWaypoint]];
         }
 
         if(rotating)
@@ -393,7 +390,13 @@ public class AiController : MonoBehaviour
 
     bool TargetDetected()
     {
-        // TODO
-        return false;
+        bool result = false;
+
+        if((currentMode == Mode.Patrol) || (currentMode == Mode.Stop))
+        {
+            // TODO: determine if a player tank was seen
+        }
+
+        return result;
     }
 }

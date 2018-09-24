@@ -450,7 +450,7 @@ Prefab:
     - target: {fileID: 114128579480160120, guid: fcb3ad640677688448244cd4645a4444,
         type: 2}
       propertyPath: patrolType
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1852296684503456, guid: fcb3ad640677688448244cd4645a4444, type: 2}
       propertyPath: m_Name
@@ -470,6 +470,12 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.y
       value: 90
       objectReference: {fileID: 0}
+    - target: {fileID: 212801884361800766, guid: fcb3ad640677688448244cd4645a4444,
+        type: 2}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 905c4f7a08e24e340b0c0cc3e48bda38,
+        type: 3}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: fcb3ad640677688448244cd4645a4444, type: 2}
   m_IsPrefabParent: 0
@@ -972,26 +978,6 @@ Prefab:
     - target: {fileID: 4825434483777062, guid: fcb3ad640677688448244cd4645a4444, type: 2}
       propertyPath: m_RootOrder
       value: 56
-      objectReference: {fileID: 0}
-    - target: {fileID: 114128579480160120, guid: fcb3ad640677688448244cd4645a4444,
-        type: 2}
-      propertyPath: attackMode
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 114128579480160120, guid: fcb3ad640677688448244cd4645a4444,
-        type: 2}
-      propertyPath: fleeDistance
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 212801884361800766, guid: fcb3ad640677688448244cd4645a4444,
-        type: 2}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: 3bb85e2f5b62ddf4aafc62dff1b39494,
-        type: 3}
-    - target: {fileID: 1852296684503456, guid: fcb3ad640677688448244cd4645a4444, type: 2}
-      propertyPath: m_Name
-      value: sprite
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: fcb3ad640677688448244cd4645a4444, type: 2}
@@ -2568,7 +2554,7 @@ Prefab:
     - target: {fileID: 114128579480160120, guid: fcb3ad640677688448244cd4645a4444,
         type: 2}
       propertyPath: patrolType
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: fcb3ad640677688448244cd4645a4444, type: 2}
@@ -2909,7 +2895,7 @@ Prefab:
     - target: {fileID: 114128579480160120, guid: fcb3ad640677688448244cd4645a4444,
         type: 2}
       propertyPath: patrolType
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 212801884361800766, guid: fcb3ad640677688448244cd4645a4444,
         type: 2}
