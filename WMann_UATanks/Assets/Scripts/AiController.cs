@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class AiController : MonoBehaviour
@@ -9,7 +8,7 @@ public class AiController : MonoBehaviour
         Cautious,
         Cowardly,
         Erratic,
-        Overconfident        
+        Overconfident
     };
 
     public enum Mode
@@ -28,26 +27,28 @@ public class AiController : MonoBehaviour
         Random
     };
 
-    public Personality personality = Personality.Cowardly;
     public float avoidanceDuration = 2;
+    public Transform collisionSensorFront;
+    public Transform collisionSensorRear;
     public bool continuousPatrolling = true;
     public float fleeDistance = 10;
     public PatrolType patrolType = PatrolType.OneWay;
+    public Personality personality = Personality.Cowardly;
     public float targetProximity = 3;
     public float waypointPrecision = 1;
 
-    private int avoidanceStage;
-    private float currentAvoidTime;
-    private Mode currentMode;
-    private int currentWaypoint;
-    private int direction;
-    private Mode previousMode;
-    private bool rotating;
-    private TankData tankData;
-    private TankMotor tankMotor;
-    private Transform target;
-    private Transform _transform;
-    private List<int> waypointList;
+    int avoidanceStage;
+    float currentAvoidTime;
+    Mode currentMode;
+    int currentWaypoint;
+    TankData data;
+    int direction;
+    TankMotor motor;
+    Mode previousMode;
+    bool rotating;
+    Transform target;
+    Transform _transform;
+    List<int> waypointList;
 
     // Use this for initialization
     void Start()
@@ -58,9 +59,12 @@ public class AiController : MonoBehaviour
         direction = 1;
         previousMode = currentMode;
         rotating = true;
-        tankData = gameObject.GetComponent<TankData>();
-        tankMotor = gameObject.GetComponent<TankMotor>();
+        data = gameObject.GetComponent<TankData>();
+        motor = gameObject.GetComponent<TankMotor>();
         _transform = gameObject.GetComponent<Transform>();
+        
+        // Set sprite based on personality
+        gameObject.GetComponentInChildren<SpriteRenderer>().sprite = GameManager.instance.aiSprites[(int) personality];
     }
 
     // Update is called once per frame
@@ -81,7 +85,7 @@ public class AiController : MonoBehaviour
                     break;
                 case Personality.Cautious:
                     // Check health
-                    if(tankData.health > (GameManager.instance.tankStartingHealth / 2))
+                    if(data.health > (GameManager.instance.aiStartingHealth / 2))
                     {
                         // Still good
                         previousMode = currentMode;
@@ -177,20 +181,10 @@ public class AiController : MonoBehaviour
     {
         if(avoidanceStage == 1)
         {
-            switch(Random.Range(1, 2))
-            {
-                // Rotate left
-                case 1:
-                    tankMotor.Rotate(-GameManager.instance.tankTurnSpeed);
-                    break;
-                // Rotate left
-                case 2:
-                    tankMotor.Rotate(GameManager.instance.tankTurnSpeed);
-                    break;
-            }
+            motor.Rotate(data.rotateSpeed);
 
             // If the tank can move, change to stage 2
-            if(CanMove(direction * GameManager.instance.enemyMoveSpeed))
+            if(CanMove(direction * data.moveSpeed))
             {
                 avoidanceStage = 2;
 
@@ -203,17 +197,21 @@ public class AiController : MonoBehaviour
         else if(avoidanceStage == 2)
         {
             // If the tank can move, do so
-            if(CanMove(direction * GameManager.instance.enemyMoveSpeed))
+            if(CanMove(direction * data.moveSpeed))
             {
                 // Update timer and move
                 currentAvoidTime -= Time.deltaTime;
-                tankMotor.Move(direction * GameManager.instance.enemyMoveSpeed);
+                motor.Move(direction * data.moveSpeed);
 
                 // If we have moved long enough, return to chase mode
                 if(currentAvoidTime <= 0)
                 {
-                    currentMode = previousMode;
                     avoidanceStage = 0;
+                    currentMode = previousMode;
+                    if(currentMode == Mode.Patrol)
+                    {
+                        rotating = true;
+                    }
                 }
             }
             else
@@ -224,15 +222,24 @@ public class AiController : MonoBehaviour
         }
     }
 
-    bool CanMove(float speed)
+    bool CanMove(float distance)
     {
         bool result = true;
 
+        RaycastHit2D hit;
+
         // Cast a ray in the direction of movement and for the specified distance
-        RaycastHit hit;
+        if(direction > 0)
+        {
+            hit = Physics2D.Raycast(collisionSensorFront.position, (direction * _transform.right), distance);
+        }
+        else
+        {
+            hit = Physics2D.Raycast(collisionSensorRear.position, (direction * _transform.right), distance);
+        }
 
         // If the raycast hit something...
-        if(Physics.Raycast(_transform.position, (direction * _transform.forward), out hit, speed))
+        if(hit.collider != null)
         {
             // ...then the tank can't move.
             result = false;
@@ -250,9 +257,12 @@ public class AiController : MonoBehaviour
 
     void EnterAvoidanceMode()
     {
-        previousMode = currentMode;
-        currentMode = Mode.Avoidance;
-        avoidanceStage = 1;
+        if(currentMode != Mode.Avoidance)
+        {
+            previousMode = currentMode;
+            currentMode = Mode.Avoidance;
+            avoidanceStage = 1;
+        }
     }
 
     void FleeTarget()
@@ -261,14 +271,14 @@ public class AiController : MonoBehaviour
         target = GameManager.instance.playerTransform;
 
         // Rotate towards the target
-        tankMotor.RotateTowards(target.position, GameManager.instance.tankTurnSpeed);
+        motor.RotateTowards(target.position, data.rotateSpeed);
 
         if(InProximityOfTarget(fleeDistance))
         {
-            if(CanMove(-GameManager.instance.enemyMoveSpeed))
+            if(CanMove(-data.moveSpeed))
             {
                 // Move backward
-                tankMotor.Move(-GameManager.instance.enemyMoveSpeed);
+                motor.Move(-data.moveSpeed);
             }
             else
             {
@@ -280,7 +290,7 @@ public class AiController : MonoBehaviour
     // Determines whether or not the tank is within the specified distance to the current target
     bool InProximityOfTarget(float distance)
     {
-        return (Vector3.SqrMagnitude(target.position - _transform.position) < (distance * distance));
+        return (Vector2.SqrMagnitude(target.position - _transform.position) < (distance * distance));
     }
 
     void Patrol()
@@ -292,7 +302,7 @@ public class AiController : MonoBehaviour
         if(InProximityOfTarget(waypointPrecision))
         {
             // Advance waypoint
-            currentWaypoint ++;
+            currentWaypoint++;
 
             // Set the tank to rotate
             rotating = true;
@@ -322,17 +332,17 @@ public class AiController : MonoBehaviour
         if(rotating)
         {
             // Rotate towards the target
-            rotating = tankMotor.RotateTowards(target.position, GameManager.instance.tankTurnSpeed);
+            rotating = motor.RotateTowards(target.position, data.rotateSpeed);
         }
         else
         {
             // If still patrolling
             if(currentMode == Mode.Patrol)
             {
-                if(CanMove(direction * GameManager.instance.enemyMoveSpeed))
+                if(CanMove(data.moveSpeed))
                 {
                     // Move forward
-                    tankMotor.Move(GameManager.instance.enemyMoveSpeed);
+                    motor.Move(data.moveSpeed);
                 }
                 else
                 {
@@ -348,15 +358,15 @@ public class AiController : MonoBehaviour
         target = GameManager.instance.playerTransform;
 
         // Rotate towards the target
-        tankMotor.RotateTowards(target.position, GameManager.instance.tankTurnSpeed);
+        motor.RotateTowards(target.position, data.rotateSpeed);
 
         // If not too close to target
         if(!InProximityOfTarget(targetProximity))
         {
-            if(CanMove(GameManager.instance.enemyMoveSpeed))
+            if(CanMove(data.moveSpeed))
             {
                 // Move forward
-                tankMotor.Move(GameManager.instance.enemyMoveSpeed);
+                motor.Move(data.moveSpeed);
             }
             else
             {
@@ -372,7 +382,7 @@ public class AiController : MonoBehaviour
         List<T> availableItems = new List<T>(list);
 
         // Iterate through the list
-        for(int i = 0; i < list.Count; i ++)
+        for(int i = 0; i < list.Count; i++)
         {
             // Randomly select from available items
             int r = Random.Range(0, availableItems.Count);
@@ -385,7 +395,7 @@ public class AiController : MonoBehaviour
 
             // Resize the set of available items (this may not be necessary)
             availableItems.TrimExcess();
-        }        
+        }
     }
 
     bool TargetDetected()

@@ -1,24 +1,35 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class TankData : MonoBehaviour
 {
     [HideInInspector]
-    public string ownerName;
+    public int health;
 
     [HideInInspector]
-    public int health;
+    public float moveSpeed;
+
+    [HideInInspector]
+    public string owner;
+
+    [HideInInspector]
+    public float rateOfFire;
+
+    [HideInInspector]
+    public float rotateSpeed;
+
+    [HideInInspector]
+    public Transform _transform;
 
     // Use this for initialization
     void Start()
     {
-        health = GameManager.instance.tankStartingHealth;
+        _transform = gameObject.GetComponent<Transform>();
+        owner = gameObject.name;
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        // TODO
     }
 }

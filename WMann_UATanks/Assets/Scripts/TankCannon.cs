@@ -1,17 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class TankCannon : MonoBehaviour
 {
-    private bool ready;
-    private float nextReadyTime;
-    private Transform _transform;
+    public GameObject missilePrefab;
+
+    bool ready;
+    float nextReadyTime;    
+    TankData data;
+    Transform _transform;
 
     // Use this for initialization
     void Start()
     {
         ready = true;
+        data = gameObject.GetComponentInParent<TankData>();
         _transform = gameObject.GetComponent<Transform>();
     }
 
@@ -29,21 +31,21 @@ public class TankCannon : MonoBehaviour
         }
     }
 
-    public void FireMissile(string ownerName)
+    public void FireMissile(string owner)
     {
         if(ready)
         {
             // Spawns a missile that moves in the direction the tank is pointing
-            GameObject missile = Instantiate(GameManager.instance.missilePrefab, _transform.position, _transform.rotation);
+            GameObject missile = Instantiate(missilePrefab, _transform.position, _transform.rotation);
 
             // Set the missile's owner
-            missile.GetComponent<Missile>().ownerName = ownerName;
+            missile.GetComponent<Missile>().owner = data.owner;
 
             // Set cannon as "unready"
             ready = false;
 
             // Set the next "ready" time
-            nextReadyTime = Time.time + GameManager.instance.tankCannonDelay;
+            nextReadyTime = Time.time + data.rateOfFire;
         }
     }
 }

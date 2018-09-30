@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class InputController : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     public enum InputScheme
     {
@@ -12,16 +10,16 @@ public class InputController : MonoBehaviour
 
     public InputScheme inputScheme = InputScheme.WASD;
 
-    private TankCannon tankCannon;
-    private TankData tankData;
-    private TankMotor tankMotor;    
+    TankCannon cannon;
+    TankData data;
+    TankMotor motor;
 
     // Use this for initialization
     void Start()
     {
-        tankCannon = gameObject.GetComponentInChildren<TankCannon>();
-        tankData = gameObject.GetComponent<TankData>();
-        tankMotor = gameObject.GetComponent<TankMotor>();
+        cannon = gameObject.GetComponentInChildren<TankCannon>();
+        data = gameObject.GetComponent<TankData>();
+        motor = gameObject.GetComponent<TankMotor>();
     }
 
     // Update is called once per frame
@@ -32,45 +30,45 @@ public class InputController : MonoBehaviour
             case InputScheme.WASD:
                 if(Input.GetKey(KeyCode.W))
                 {
-                    tankMotor.Move(GameManager.instance.playerMoveSpeed);
+                    motor.Move(data.moveSpeed);
                 }
                 if(Input.GetKey(KeyCode.S))
                 {
-                    tankMotor.Move(-GameManager.instance.playerMoveSpeed);
+                    motor.Move(-data.moveSpeed);
                 }
                 if(Input.GetKey(KeyCode.D))
                 {
-                    tankMotor.Rotate(GameManager.instance.tankTurnSpeed);
+                    motor.Rotate(-data.rotateSpeed);
                 }
                 if(Input.GetKey(KeyCode.A))
                 {
-                    tankMotor.Rotate(-GameManager.instance.tankTurnSpeed);
+                    motor.Rotate(data.rotateSpeed);
                 }
                 if(Input.GetKeyDown(KeyCode.Space))
                 {
-                    tankCannon.FireMissile(tankData.ownerName);
+                    cannon.FireMissile(data.owner);
                 }
                 break;
             case InputScheme.arrowKeys:
                 if(Input.GetKey(KeyCode.UpArrow))
                 {
-                    tankMotor.Move(GameManager.instance.playerMoveSpeed);
+                    motor.Move(data.moveSpeed);
                 }
                 if(Input.GetKey(KeyCode.DownArrow))
                 {
-                    tankMotor.Move(-GameManager.instance.playerMoveSpeed);
+                    motor.Move(-data.moveSpeed);
                 }
                 if(Input.GetKey(KeyCode.RightArrow))
                 {
-                    tankMotor.Rotate(GameManager.instance.tankTurnSpeed);
+                    motor.Rotate(-data.rotateSpeed);
                 }
                 if(Input.GetKey(KeyCode.LeftArrow))
                 {
-                    tankMotor.Rotate(-GameManager.instance.tankTurnSpeed);
+                    motor.Rotate(data.rotateSpeed);
                 }
                 if(Input.GetKeyDown(KeyCode.Return))
                 {
-                    tankCannon.FireMissile(tankData.ownerName);
+                    cannon.FireMissile(data.owner);
                 }
                 break;
         }

@@ -1,25 +1,20 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-
-    public float missileLife = 3;
-    public int missileMinDamage = 3;
-    public int missileMaxDamage = 7;
-    public float missileSpeed = 10;
+    
+    public float aiMoveSpeed = 2.5f;
+    public int aiStartingHealth = 10;
+    public float aiRotateSpeed = 120;
     public float playerMoveSpeed = 3;
-    public float enemyMoveSpeed = 2.5f;
-    public float tankCannonDelay = 2;
-    public int tankStartingHealth = 10;
-    public float tankTurnSpeed = 180;
+    public int playerStartingHealth = 15;
+    public float playerRotateSpeed = 180;
+    public float rateOfFire = 3;
 
+    public Sprite[] aiSprites;
     public GameObject aiTankPrefab;
-    public GameObject missilePrefab;
     public GameObject playerTankPrefab;
-
     public Transform[] waypoints;
 
     [HideInInspector]
@@ -28,8 +23,8 @@ public class GameManager : MonoBehaviour
     [HideInInspector]
     public Transform playerTransform;
 
-    private Vector3 cameraOffset;
-    private Transform cameraTransform;
+    Vector3 cameraOffset;
+    Transform cameraTransform;
 
     void Awake()
     {
@@ -47,20 +42,14 @@ public class GameManager : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        // Create the player's tank
-        playerTank = Instantiate(playerTankPrefab);
-        playerTank.GetComponent<TankData>().ownerName = "Player";
-        playerTransform = playerTank.GetComponent<Transform>();
-
-        // Initialize some values for the camera to follow the player
-        cameraTransform = Camera.main.GetComponent<Transform>();
-        cameraOffset = cameraTransform.position - playerTransform.position;
+        CreatePlayer("Player1");
+        InitializeCamera();
     }
 
     // Update is called once per frame
     void Update()
     {
-        // Set the position of the camera to be the same as the player's plus offset
+        // Make the camera follow the player
         cameraTransform.position = playerTransform.position + cameraOffset;
     }
 
@@ -89,4 +78,25 @@ public class GameManager : MonoBehaviour
         aiController.attackMode = _attackMode;
     }
     */
+
+    void CreatePlayer(string playerName)
+    {
+        playerTank = Instantiate(playerTankPrefab);        
+
+        TankData playerData = playerTank.GetComponent<TankData>();
+
+        playerData.health = playerStartingHealth;
+        playerData.moveSpeed = playerMoveSpeed;
+        playerData.owner = playerName;
+        playerData.rateOfFire = rateOfFire;
+        playerData.rotateSpeed = playerRotateSpeed;
+    }
+
+    // Sets some values needed for the camera to follow the player
+    void InitializeCamera()
+    {
+        playerTransform = playerTank.GetComponent<Transform>();
+        cameraTransform = Camera.main.GetComponent<Transform>();
+        cameraOffset = cameraTransform.position - playerTransform.position;
+    }
 }
