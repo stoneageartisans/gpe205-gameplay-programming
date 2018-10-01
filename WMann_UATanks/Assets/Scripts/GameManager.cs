@@ -14,11 +14,8 @@ public class GameManager : MonoBehaviour
 
     public Sprite[] aiSprites;
     public GameObject aiTankPrefab;
-    public GameObject playerTankPrefab;
-    public Transform[] waypoints;
-
-    [HideInInspector]
     public GameObject playerTank;
+    public Transform[] waypoints;    
 
     [HideInInspector]
     public Transform playerTransform;
@@ -42,8 +39,10 @@ public class GameManager : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        CreatePlayer("Player1");
-        InitializeCamera();
+        playerTransform = playerTank.GetComponent<Transform>();
+        cameraTransform = Camera.main.GetComponent<Transform>();
+        cameraTransform.position = new Vector3(playerTransform.position.x, playerTransform.position.y, cameraTransform.position.z);
+        cameraOffset = cameraTransform.position - playerTransform.position;
     }
 
     // Update is called once per frame
@@ -77,7 +76,6 @@ public class GameManager : MonoBehaviour
         aiController.continuousPatrolling = false;
         aiController.attackMode = _attackMode;
     }
-    */
 
     void CreatePlayer(string playerName)
     {
@@ -91,12 +89,5 @@ public class GameManager : MonoBehaviour
         playerData.rateOfFire = rateOfFire;
         playerData.rotateSpeed = playerRotateSpeed;
     }
-
-    // Sets some values needed for the camera to follow the player
-    void InitializeCamera()
-    {
-        playerTransform = playerTank.GetComponent<Transform>();
-        cameraTransform = Camera.main.GetComponent<Transform>();
-        cameraOffset = cameraTransform.position - playerTransform.position;
-    }
+    */
 }

@@ -27,7 +27,7 @@ public class AiController : MonoBehaviour
         Random
     };
 
-    public float avoidanceDuration = 2;
+    public float avoidanceDuration = 2.5f;
     public Transform collisionSensorFront;
     public Transform collisionSensorRear;
     public bool continuousPatrolling = true;
@@ -37,6 +37,7 @@ public class AiController : MonoBehaviour
     public float targetProximity = 3;
     public float waypointPrecision = 1;
 
+    int avoidanceDirection;
     int avoidanceStage;
     float currentAvoidTime;
     Mode currentMode;
@@ -47,22 +48,28 @@ public class AiController : MonoBehaviour
     Mode previousMode;
     bool rotating;
     Transform target;
-    Transform _transform;
     List<int> waypointList;
 
     // Use this for initialization
     void Start()
     {
         AssignWaypoints();
+
+        avoidanceDirection = 0;
         avoidanceStage = 0;
         currentMode = Mode.Patrol;
         direction = 1;
         previousMode = currentMode;
         rotating = true;
+
         data = gameObject.GetComponent<TankData>();
+        data.health = GameManager.instance.aiStartingHealth;
+        data.moveSpeed = GameManager.instance.aiMoveSpeed;
+        data.rateOfFire = GameManager.instance.rateOfFire;
+        data.rotateSpeed = GameManager.instance.aiRotateSpeed;
+
         motor = gameObject.GetComponent<TankMotor>();
-        _transform = gameObject.GetComponent<Transform>();
-        
+
         // Set sprite based on personality
         gameObject.GetComponentInChildren<SpriteRenderer>().sprite = GameManager.instance.aiSprites[(int) personality];
     }
@@ -100,7 +107,7 @@ public class AiController : MonoBehaviour
                     break;
                 case Personality.Erratic:
                     // Flip a coin - 1 is Heads, 2 is Tails
-                    if(Random.Range(1, 2) == 1)
+                    if(Random.Range(1, 3) == 1)
                     {
                         // Heads
                         previousMode = currentMode;
@@ -181,7 +188,7 @@ public class AiController : MonoBehaviour
     {
         if(avoidanceStage == 1)
         {
-            motor.Rotate(data.rotateSpeed);
+            motor.Rotate(avoidanceDirection * data.rotateSpeed);
 
             // If the tank can move, change to stage 2
             if(CanMove(direction * data.moveSpeed))
@@ -231,11 +238,11 @@ public class AiController : MonoBehaviour
         // Cast a ray in the direction of movement and for the specified distance
         if(direction > 0)
         {
-            hit = Physics2D.Raycast(collisionSensorFront.position, (direction * _transform.right), distance);
+            hit = Physics2D.Raycast(collisionSensorFront.position, (direction * data._transform.right), distance);
         }
         else
         {
-            hit = Physics2D.Raycast(collisionSensorRear.position, (direction * _transform.right), distance);
+            hit = Physics2D.Raycast(collisionSensorRear.position, (direction * data._transform.right), distance);
         }
 
         // If the raycast hit something...
@@ -262,6 +269,28 @@ public class AiController : MonoBehaviour
             previousMode = currentMode;
             currentMode = Mode.Avoidance;
             avoidanceStage = 1;
+
+            // If this is the first time avoiding an obstacle
+            if(avoidanceDirection == 0)
+            {
+                // Randomly determine starting rotation direction
+                switch(Random.Range(1, 3))
+                {
+                    case 1:
+                        // Left
+                        avoidanceDirection = 1;
+                        break;
+                    case 2:
+                        // Right
+                        avoidanceDirection = (-1);
+                        break;
+                }
+            }
+            else
+            {
+                // Switch the direction of rotation
+                avoidanceDirection *= (-1);
+            }
         }
     }
 
@@ -290,7 +319,14 @@ public class AiController : MonoBehaviour
     // Determines whether or not the tank is within the specified distance to the current target
     bool InProximityOfTarget(float distance)
     {
-        return (Vector2.SqrMagnitude(target.position - _transform.position) < (distance * distance));
+        bool result = false;
+
+        if(Vector2.Distance(data._transform.position, target.position) < distance)
+        {
+            result = true;
+        }
+
+        return result;
     }
 
     void Patrol()
@@ -341,6 +377,9 @@ public class AiController : MonoBehaviour
             {
                 if(CanMove(data.moveSpeed))
                 {
+                    // Make any necessary course corrections
+                    motor.RotateTowards(target.position, data.rotateSpeed);
+
                     // Move forward
                     motor.Move(data.moveSpeed);
                 }

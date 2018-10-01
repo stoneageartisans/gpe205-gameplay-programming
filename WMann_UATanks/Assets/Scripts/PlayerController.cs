@@ -17,8 +17,13 @@ public class PlayerController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        cannon = gameObject.GetComponentInChildren<TankCannon>();
         data = gameObject.GetComponent<TankData>();
+        data.health = GameManager.instance.playerStartingHealth;
+        data.moveSpeed = GameManager.instance.playerMoveSpeed;
+        data.rateOfFire = GameManager.instance.rateOfFire;
+        data.rotateSpeed = GameManager.instance.playerRotateSpeed;
+
+        cannon = gameObject.GetComponentInChildren<TankCannon>();
         motor = gameObject.GetComponent<TankMotor>();
     }
 

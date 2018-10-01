@@ -42,7 +42,7 @@ public class TankMotor : MonoBehaviour
         Quaternion targetRotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
         // Check if the tank is facing the target
-        if(data._transform.rotation.z == targetRotation.z)
+        if(Mathf.Approximately(data._transform.rotation.z, targetRotation.z))
         {
             // Done rotating
             result = false;

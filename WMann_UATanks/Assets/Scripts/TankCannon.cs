@@ -35,8 +35,8 @@ public class TankCannon : MonoBehaviour
     {
         if(ready)
         {
-            // Spawns a missile that moves in the direction the tank is pointing
-            GameObject missile = Instantiate(missilePrefab, _transform.position, _transform.rotation);
+            // Spawns a missile from the cannon that moves in the direction the tank is pointing
+            GameObject missile = Instantiate(missilePrefab, _transform.position, data._transform.rotation);
 
             // Set the missile's owner
             missile.GetComponent<Missile>().owner = data.owner;
