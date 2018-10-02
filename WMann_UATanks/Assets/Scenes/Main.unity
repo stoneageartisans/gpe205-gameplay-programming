@@ -517,9 +517,10 @@ MonoBehaviour:
   Columns: 10
   Rows: 10
   TilePrefabList:
-  - {fileID: 1668538725384758, guid: ed3618922cdaed14788b92bcd5ef504e, type: 2}
-  - {fileID: 1078713320933048, guid: 95d7f2f385adc6d4b9325d1af40a3835, type: 2}
   - {fileID: 1522730867293660, guid: 99b4387ccfd1641418a093853f24719b, type: 2}
+  - {fileID: 1262841810017524, guid: 98ae95001fdebe743ba2ae07f0cbfee0, type: 2}
+  - {fileID: 1162513044346386, guid: 8ab350e0cac8271418ebd440c6c9ce8a, type: 2}
+  - {fileID: 1107654295213012, guid: 9414f752b3d4d8e41b3119f5234f27f2, type: 2}
   CornerTilePrefab: {fileID: 1668538725384758, guid: ed3618922cdaed14788b92bcd5ef504e,
     type: 2}
   SideTilePrefab: {fileID: 1078713320933048, guid: 95d7f2f385adc6d4b9325d1af40a3835,
