@@ -26,19 +26,19 @@ public class Missile : MonoBehaviour
         // TODO
     }
 
-    void OnTriggerEnter2D(Collider2D collider)
+    void OnCollisionEnter2D(Collision2D collision)
     {
         // Destroy the missile
         Destroy(gameObject);
 
         // When the missile hits a tank
-        if(collider.name.ToLower().Contains("tank"))
+        if(collision.collider.name.ToLower().Contains("tank"))
         {
             // Report the missile's owner
-            Debug.Log(owner + "'s missile hit " + collider.GetComponent<TankData>().owner);
+            Debug.Log(owner + "'s missile hit " + collision.collider.GetComponent<TankData>().owner);
 
             // Do damage to hit tank
-            DamageTank(collider);
+            DamageTank(collision.collider);
         }
     }
 

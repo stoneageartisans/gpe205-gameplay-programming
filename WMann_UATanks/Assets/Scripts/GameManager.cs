@@ -3,7 +3,9 @@
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-    
+
+    public float aiAccuracyInDegrees = 15;
+    public float aiFiringRange = 15;
     public float aiMoveSpeed = 2.5f;
     public int aiStartingHealth = 10;
     public float aiRotateSpeed = 120;

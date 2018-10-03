@@ -39,6 +39,7 @@ public class AiController : MonoBehaviour
 
     int avoidanceDirection;
     int avoidanceStage;
+    TankCannon cannon;
     float currentAvoidTime;
     Mode currentMode;
     int currentWaypoint;
@@ -48,6 +49,7 @@ public class AiController : MonoBehaviour
     Mode previousMode;
     bool rotating;
     Transform target;
+    bool targetDetected;
     List<int> waypointList;
 
     // Use this for initialization
@@ -61,6 +63,7 @@ public class AiController : MonoBehaviour
         direction = 1;
         previousMode = currentMode;
         rotating = true;
+        targetDetected = false;
 
         data = gameObject.GetComponent<TankData>();
         data.health = GameManager.instance.aiStartingHealth;
@@ -68,6 +71,7 @@ public class AiController : MonoBehaviour
         data.rateOfFire = GameManager.instance.rateOfFire;
         data.rotateSpeed = GameManager.instance.aiRotateSpeed;
 
+        cannon = gameObject.GetComponentInChildren<TankCannon>();
         motor = gameObject.GetComponent<TankMotor>();
 
         // Set sprite based on personality
@@ -77,7 +81,7 @@ public class AiController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(TargetDetected())
+        if(targetDetected)
         {
             // Determine action based on personality
             switch(personality)
@@ -121,6 +125,8 @@ public class AiController : MonoBehaviour
                     }
                     break;
             }
+
+            targetDetected = false;
         }
 
         switch(currentMode)
@@ -129,12 +135,14 @@ public class AiController : MonoBehaviour
                 AvoidObstacle();
                 break;
             case Mode.Flee:
+                direction = (-1);
                 FleeTarget();
                 break;
             case Mode.Patrol:
                 Patrol();
                 break;
             case Mode.Pursue:
+                direction = 1;
                 PursueTarget();
                 break;
             case Mode.Stop:
@@ -294,13 +302,34 @@ public class AiController : MonoBehaviour
         }
     }
 
+    void ExecuteFiringSolution()
+    {
+        // If the target is withing firing range
+        if(Vector2.Distance(data._transform.position, target.position) <= GameManager.instance.aiFiringRange)
+        {
+            // Find the rotation that points toward the target
+            Vector3 vectorToTarget = target.position - data._transform.position;
+            float angle = Mathf.Atan2(vectorToTarget.y, vectorToTarget.x) * Mathf.Rad2Deg;
+            Quaternion targetRotation = Quaternion.AngleAxis(angle, Vector3.forward);
+
+            // Check if the tank's facing is within it's aim accuracy
+            if(Quaternion.Angle(data._transform.rotation, targetRotation) <= GameManager.instance.aiAccuracyInDegrees)
+            {
+                // FIRE!
+                cannon.FireMissile(data.owner);
+            }
+        }
+    }
+
     void FleeTarget()
     {
         // Set the player's tank as the target
-        target = GameManager.instance.playerTransform;
+        target = GameManager.instance.playerTransform;        
 
         // Rotate towards the target
         motor.RotateTowards(target.position, data.rotateSpeed);
+
+        ExecuteFiringSolution();
 
         if(InProximityOfTarget(fleeDistance))
         {
@@ -399,6 +428,8 @@ public class AiController : MonoBehaviour
         // Rotate towards the target
         motor.RotateTowards(target.position, data.rotateSpeed);
 
+        ExecuteFiringSolution();
+
         // If not too close to target
         if(!InProximityOfTarget(targetProximity))
         {
@@ -437,15 +468,14 @@ public class AiController : MonoBehaviour
         }
     }
 
-    bool TargetDetected()
+    public void TargetWasDetected()
     {
-        bool result = false;
-
         if((currentMode == Mode.Patrol) || (currentMode == Mode.Stop))
         {
-            // TODO: determine if a player tank was seen
+            if(targetDetected == false)
+            {
+                targetDetected = true;
+            }
         }
-
-        return result;
     }
 }
