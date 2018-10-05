@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class MapGenerator : MonoBehaviour
 {
+    public static MapGenerator instance;
+
     public int Columns = 10;
     public int Rows = 10;
 
@@ -17,9 +19,26 @@ public class MapGenerator : MonoBehaviour
     [Tooltip("The tile's rotation for the upper side")]
     public float UpperSideRotationZ = 0;
 
+    List<GameObject> TileList;
+
+    void Awake()
+    {
+        if(instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Debug.Log("ERROR: An instance of " + gameObject.name + " already exists.");
+            Destroy(gameObject);
+        }
+    }
+
     // Use this for initialization
     void Start()
     {
+        TileList = new List<GameObject>();
+
         int offset = 10;
         int startX = (offset / 2) - ((Columns / 2) * offset);
         int startY = ((Rows / 2) * offset) - (offset / 2);
@@ -115,13 +134,58 @@ public class MapGenerator : MonoBehaviour
 
                 // Make the tile a parent of the map object
                 tile.transform.parent = gameObject.transform;
+
+                TileList.Add(tile);
             }
         }
+
+        GameManager.instance.GetAiSpawnPoints();
+        GameManager.instance.GetPlayerSpawnPoints();
     }
 
     // Update is called once per frame
     void Update()
     {
 
+    }
+
+    public List<Vector3> GetAiSpawnPoints()
+    {
+        List<Vector3> spawnPoints = new List<Vector3>();
+
+        foreach(GameObject tile in TileList)
+        {
+            Transform[] children = tile.GetComponentsInChildren<Transform>();
+
+            foreach(Transform child in children)
+            {
+                if(child.name.ToLower().Contains("aispawn"))
+                {
+                    spawnPoints.Add(child.position);
+                }
+            }            
+        }
+
+        return spawnPoints;
+    }
+
+    public List<Vector3> GetPlayerSpawnPoints()
+    {
+        List<Vector3> spawnPoints = new List<Vector3>();
+
+        foreach(GameObject tile in TileList)
+        {
+            Transform[] children = tile.GetComponentsInChildren<Transform>();
+
+            foreach(Transform child in children)
+            {
+                if(child.name.ToLower().Contains("playerspawn"))
+                {
+                    spawnPoints.Add(child.position);
+                }
+            }
+        }
+
+        return spawnPoints;
     }
 }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
@@ -9,21 +10,27 @@ public class GameManager : MonoBehaviour
     public float aiMoveSpeed = 2.5f;
     public int aiStartingHealth = 10;
     public float aiRotateSpeed = 120;
+    public int enemyCount = 4;
     public float playerMoveSpeed = 3;
     public int playerStartingHealth = 15;
     public float playerRotateSpeed = 180;
     public float rateOfFire = 3;
 
     public Sprite[] aiSprites;
+    
     public GameObject aiTankPrefab;
-    public GameObject playerTank;
+    public GameObject playerTankPrefab;
     public Transform[] waypoints;    
 
     [HideInInspector]
     public Transform playerTransform;
 
+    List<Vector3> aiSpawnPoints;
+    List<GameObject> aiTankList;
     Vector3 cameraOffset;
     Transform cameraTransform;
+    List<Vector3> playerSpawnPoints;
+    GameObject playerTank;
 
     void Awake()
     {
@@ -41,10 +48,7 @@ public class GameManager : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        playerTransform = playerTank.GetComponent<Transform>();
-        cameraTransform = Camera.main.GetComponent<Transform>();
-        cameraTransform.position = new Vector3(playerTransform.position.x, playerTransform.position.y, cameraTransform.position.z);
-        cameraOffset = cameraTransform.position - playerTransform.position;
+        
     }
 
     // Update is called once per frame
@@ -54,42 +58,69 @@ public class GameManager : MonoBehaviour
         cameraTransform.position = playerTransform.position + cameraOffset;
     }
 
-    /*
-    void CreateEnemy(string name, float x, float z, AiController.PatrolType _patrolType, bool _continuousPatrolling)
+    void CreateEnemies(int enemyCount)
     {
-        GameObject aiTank = Instantiate(aiTankPrefab);
-        aiTank.transform.position = new Vector3(x, aiTank.transform.position.y, z);
-        aiTank.GetComponent<TankData>().ownerName = name;
+        aiTankList = new List<GameObject>();
 
-        AiController aiController = aiTank.GetComponent<AiController>();
-        aiController.patrolType = _patrolType;
-        aiController.continuousPatrolling = _continuousPatrolling;
-        aiController.attackMode = AiController.AttackMode.None;
+        for(int i = 0; i < enemyCount; i ++)
+        {
+            CreateEnemy();
+        }
     }
 
-    void CreateEnemy(string name, float x, float z, AiController.AttackMode _attackMode)
+    void CreateEnemy()
     {
         GameObject aiTank = Instantiate(aiTankPrefab);
-        aiTank.transform.position = new Vector3(x, aiTank.transform.position.y, z);
-        aiTank.GetComponent<TankData>().ownerName = name;
+        aiTank.GetComponent<TankData>().owner = ("Enemy Tank " + (aiTankList.Count + 1));        
 
         AiController aiController = aiTank.GetComponent<AiController>();
-        aiController.patrolType = AiController.PatrolType.None;
-        aiController.continuousPatrolling = false;
-        aiController.attackMode = _attackMode;
+        aiController.personality = (AiController.Personality) aiTankList.Count;
+        aiController.patrolType = (AiController.PatrolType) Random.Range(0, System.Enum.GetNames(typeof(AiController.PatrolType)).Length);
+        
+        switch(Random.Range(0, 2))
+        {
+            case 0:
+                aiController.continuousPatrolling = false;
+                break;
+            case 1:
+                aiController.continuousPatrolling = true;
+                break;
+        }
+
+        int i = Random.Range(0, aiSpawnPoints.Count);
+        aiTank.transform.position = aiSpawnPoints[i];
+        aiSpawnPoints.RemoveAt(i);
+
+        aiTankList.Add(aiTank);
     }
 
     void CreatePlayer(string playerName)
     {
-        playerTank = Instantiate(playerTankPrefab);        
+        playerTank = Instantiate(playerTankPrefab);
+        playerTank.GetComponent<TankData>().owner = playerName;
 
-        TankData playerData = playerTank.GetComponent<TankData>();
-
-        playerData.health = playerStartingHealth;
-        playerData.moveSpeed = playerMoveSpeed;
-        playerData.owner = playerName;
-        playerData.rateOfFire = rateOfFire;
-        playerData.rotateSpeed = playerRotateSpeed;
+        int i = Random.Range(0, playerSpawnPoints.Count);
+        playerTank.transform.position = playerSpawnPoints[i];
     }
-    */
+
+    public void GetAiSpawnPoints()
+    {
+        aiSpawnPoints = MapGenerator.instance.GetAiSpawnPoints();
+        CreateEnemies(enemyCount);
+    }
+
+    public void GetPlayerSpawnPoints()
+    {
+        playerSpawnPoints = MapGenerator.instance.GetPlayerSpawnPoints();
+        CreatePlayer("Player 1");
+        InitializeCamera();
+    }
+
+    void InitializeCamera()
+    {
+        playerTransform = playerTank.GetComponent<Transform>();
+        cameraTransform = Camera.main.GetComponent<Transform>();
+        cameraTransform.position = new Vector3(playerTransform.position.x, playerTransform.position.y, cameraTransform.position.z);
+        cameraOffset = cameraTransform.position - playerTransform.position;
+    }
 }
