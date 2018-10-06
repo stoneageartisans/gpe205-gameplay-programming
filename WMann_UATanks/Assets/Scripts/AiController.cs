@@ -239,6 +239,7 @@ public class AiController : MonoBehaviour
 
     bool CanMove(float distance)
     {
+        // By default the tank can move
         bool result = true;
 
         RaycastHit2D hit;
@@ -256,14 +257,11 @@ public class AiController : MonoBehaviour
         // If the raycast hit something...
         if(hit.collider != null)
         {
-            // ...then the tank can't move.
-            result = false;
-
-            // Unless it was a player tank... 
-            if(hit.collider.name.ToLower().Contains("player"))
+            // ...and it's a wall
+            if(hit.collider.name.ToLower().Contains("tile"))
             {
-                // ...then it CAN actually move
-                result = true;
+                // ...then it can't move
+                result = false;
             }
         }
 

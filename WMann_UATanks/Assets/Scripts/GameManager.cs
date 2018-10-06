@@ -103,6 +103,15 @@ public class GameManager : MonoBehaviour
         playerTank.transform.position = playerSpawnPoints[i];
     }
 
+    public void DamageTank(Collider2D collider, int damage)
+    {
+        // Reduce tank health by random damage between range
+        collider.GetComponent<TankData>().health -= damage;
+
+        // Report damage
+        Debug.Log(collider.GetComponent<TankData>().owner + "'s health is now " + collider.GetComponent<TankData>().health);
+    }
+
     public void GetAiSpawnPoints()
     {
         aiSpawnPoints = MapGenerator.instance.GetAiSpawnPoints();

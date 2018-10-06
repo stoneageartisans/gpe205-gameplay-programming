@@ -38,16 +38,7 @@ public class Missile : MonoBehaviour
             Debug.Log(owner + "'s missile hit " + collision.collider.GetComponent<TankData>().owner);
 
             // Do damage to hit tank
-            DamageTank(collision.collider);
+            GameManager.instance.DamageTank(collision.collider, Random.Range(minDamage, maxDamage));
         }
-    }
-
-    void DamageTank(Collider2D collider)
-    {
-        // Reduce tank health by random damage between range
-        collider.GetComponent<TankData>().health -= Random.Range(minDamage, maxDamage);
-
-        // Report damage
-        Debug.Log(collider.GetComponent<TankData>().owner + "'s health is now " + collider.GetComponent<TankData>().health);
     }
 }
