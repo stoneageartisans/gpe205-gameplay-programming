@@ -1,24 +1,28 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
     public float aiAccuracyInDegrees = 15;
-    public float aiFiringRange = 15;
+    public float aiFiringRange = 20;
     public float aiMoveSpeed = 2.5f;
     public int aiStartingHealth = 10;
     public float aiRotateSpeed = 120;
     public int enemiesPerRound = 4;
     public float playerMoveSpeed = 3;
     public int playerStartingHealth = 15;
+    public int playerStartingLives = 3;
     public float playerRotateSpeed = 180;
     public float rateOfFire = 3;
 
     public Sprite[] aiSprites;
     
     public GameObject aiTankPrefab;
+    public Text playerLivesText;
+    public Text playerScoreText;
     public GameObject playerTankPrefab;
     public Transform[] waypoints;
 
@@ -32,6 +36,7 @@ public class GameManager : MonoBehaviour
     Vector3 cameraOffset;
     Transform cameraTransform;
     int enemyCount;
+    int playerLives;
     int playerScore;
     List<Vector3> playerSpawnPoints;
     GameObject playerTank;
@@ -54,8 +59,10 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         enemyCount = 0;
+        playerLives = playerStartingLives;
         playerScore = 0;
         respawnPlayer = false;
+        UpdateUi();
     }
 
     // Update is called once per frame
@@ -63,13 +70,25 @@ public class GameManager : MonoBehaviour
     {
         if(respawnPlayer)
         {
-            ClearEnemyTargets();
-            CreatePlayer(PlayerName);
-            InitializeCamera();
+            UpdateUi();
+
+            if(GameIsOver())
+            {
+                ResetGame();
+            }
+            else
+            {
+                ClearEnemyTargets();
+                CreatePlayer(PlayerName);
+                InitializeCamera();
+            }
         }
 
         // Make the camera follow the player
-        cameraTransform.position = playerTransform.position + cameraOffset;   
+        if(playerTransform != null)
+        {
+            cameraTransform.position = playerTransform.position + cameraOffset;
+        }
     }
 
     void ClearEnemyTargets()
@@ -82,19 +101,27 @@ public class GameManager : MonoBehaviour
 
     void CreateEnemies(int number)
     {
+        int personalityIndex = 0;
+
         for(int i = 0; i < number; i ++)
         {
-            CreateEnemy();
+            CreateEnemy(personalityIndex);
+            personalityIndex++;
+            if(personalityIndex >= System.Enum.GetNames(typeof(AiController.PatrolType)).Length)
+            {
+                personalityIndex = 0;
+            }
         }
     }
 
-    void CreateEnemy()
+    void CreateEnemy(int personalityIndex)
     {
         GameObject aiTank = Instantiate(aiTankPrefab);
         aiTank.GetComponent<TankData>().owner = ("Enemy Tank " + (enemyCount + 1));        
 
         AiController aiController = aiTank.GetComponent<AiController>();
-        aiController.personality = (AiController.Personality) enemyCount;
+
+        aiController.personality = (AiController.Personality) personalityIndex;
         aiController.patrolType = (AiController.PatrolType) Random.Range(0, System.Enum.GetNames(typeof(AiController.PatrolType)).Length);
         
         switch(Random.Range(0, 2))
@@ -141,12 +168,13 @@ public class GameManager : MonoBehaviour
             if(tankData.owner.ToLower().Contains("player"))
             {
                 respawnPlayer = true;
-                playerScore--;
+                playerLives--;
             }
             else
             {
                 enemyCount--;
                 playerScore++;
+                UpdateUi();
             }
 
             // Destroy the tank
@@ -160,6 +188,18 @@ public class GameManager : MonoBehaviour
 
         // Report damage
         Debug.Log(collider.GetComponent<TankData>().owner + "'s health is now " + collider.GetComponent<TankData>().health);
+    }
+
+    bool GameIsOver()
+    {
+        bool result = false;
+
+        if(playerLives < 1)
+        {
+            result = true;
+        }
+
+        return result;
     }
 
     public void GetAiSpawnPoints()
@@ -181,5 +221,21 @@ public class GameManager : MonoBehaviour
         cameraTransform = Camera.main.GetComponent<Transform>();
         cameraTransform.position = new Vector3(playerTransform.position.x, playerTransform.position.y, cameraTransform.position.z);
         cameraOffset = cameraTransform.position - playerTransform.position;
+    }
+
+    public void ResetGame()
+    {
+        foreach(AiController aiTank in GameObject.FindObjectsOfType<AiController>())
+        {
+            Destroy(aiTank.gameObject);
+        }
+        Start();
+        MapGenerator.instance.ResetMap();
+    }
+
+    void UpdateUi()
+    {
+        playerLivesText.text = "Lives: " + playerLives;
+        playerScoreText.text = "Score: " + playerScore;
     }
 }

@@ -188,4 +188,9 @@ public class MapGenerator : MonoBehaviour
 
         return spawnPoints;
     }
+
+    public void ResetMap()
+    {
+        Start();
+    }
 }

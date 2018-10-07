@@ -45,6 +45,13 @@ public class Missile : MonoBehaviour
             // Report the missile's owner
             Debug.Log(owner + "'s missile hit " + collision.collider.GetComponent<TankData>().owner);
 
+            // If the player hit an ai tank...
+            if(owner.ToLower().Contains("player"))
+            {
+                // ...then the ai tank detects the player
+                collision.collider.gameObject.GetComponent<AiController>().TargetWasDetected();
+            }
+
             // Do damage to hit tank
             GameManager.instance.DamageTank(collision.collider, Random.Range(minDamage, maxDamage));
         }
