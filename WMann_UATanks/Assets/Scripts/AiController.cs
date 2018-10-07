@@ -196,11 +196,14 @@ public class AiController : MonoBehaviour
     {
         if(avoidanceStage == 1)
         {
+            motor.PauseMoveSound();
             motor.Rotate(avoidanceDirection * data.rotateSpeed);
+            motor.PlayRotateSound();
 
             // If the tank can move, change to stage 2
             if(CanMove(direction * data.moveSpeed))
             {
+                motor.PauseRotateSound();
                 avoidanceStage = 2;
 
                 // Set the number of seconds we will stay in Stage2
@@ -217,6 +220,7 @@ public class AiController : MonoBehaviour
                 // Update timer and move
                 currentAvoidTime -= Time.deltaTime;
                 motor.Move(direction * data.moveSpeed);
+                motor.PlayMoveSound();
 
                 // If we have moved long enough, return to chase mode
                 if(currentAvoidTime <= 0)
@@ -266,6 +270,11 @@ public class AiController : MonoBehaviour
         }
 
         return result;
+    }
+
+    public void ClearTarget()
+    {
+        currentMode = Mode.Patrol;
     }
 
     void EnterAvoidanceMode()
@@ -333,12 +342,16 @@ public class AiController : MonoBehaviour
         {
             if(CanMove(-data.moveSpeed))
             {
+                motor.PauseRotateSound();
+
                 // Move backward
                 motor.Move(-data.moveSpeed);
+                motor.PlayMoveSound();
             }
             else
             {
                 EnterAvoidanceMode();
+                motor.PauseMoveSound();
             }
         }
     }
@@ -394,11 +407,15 @@ public class AiController : MonoBehaviour
 
         if(rotating)
         {
+            motor.PauseMoveSound();
+
             // Rotate towards the target
             rotating = motor.RotateTowards(target.position, data.rotateSpeed);
         }
         else
         {
+            motor.PauseRotateSound();
+
             // If still patrolling
             if(currentMode == Mode.Patrol)
             {
@@ -409,6 +426,7 @@ public class AiController : MonoBehaviour
 
                     // Move forward
                     motor.Move(data.moveSpeed);
+                    motor.PlayMoveSound();
                 }
                 else
                 {
@@ -433,11 +451,15 @@ public class AiController : MonoBehaviour
         {
             if(CanMove(data.moveSpeed))
             {
+                motor.PauseRotateSound();
+
                 // Move forward
                 motor.Move(data.moveSpeed);
+                motor.PlayMoveSound();
             }
             else
             {
+                motor.PauseMoveSound();
                 EnterAvoidanceMode();
             }
         }

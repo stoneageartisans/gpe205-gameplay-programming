@@ -2,6 +2,9 @@
 
 public class TankMotor : MonoBehaviour
 {
+    public AudioSource moveSound;
+    public AudioSource rotateSound;
+
     TankData data;
 
     // Use this for initialization
@@ -21,6 +24,38 @@ public class TankMotor : MonoBehaviour
     {
         // Translate the tank along the local x axis by speed and time
         data._transform.Translate(Vector3.right * speed * Time.deltaTime, Space.Self);
+    }
+
+    public void PauseMoveSound()
+    {
+        if(moveSound.isPlaying)
+        {
+            moveSound.Pause();
+        }
+    }
+
+    public void PauseRotateSound()
+    {
+        if(rotateSound.isPlaying)
+        {
+            rotateSound.Pause();
+        }
+    }
+
+    public void PlayMoveSound()
+    {
+        if(!moveSound.isPlaying)
+        {
+            moveSound.Play();
+        }
+    }
+
+    public void PlayRotateSound()
+    {
+        if(!rotateSound.isPlaying)
+        {
+            rotateSound.Play();
+        }
     }
 
     // This function rotates the tank
@@ -46,11 +81,15 @@ public class TankMotor : MonoBehaviour
         {
             // Done rotating
             result = false;
+
+            PauseRotateSound();
         }
         else
         {
             // Rotate the tank this frame
             data._transform.rotation = Quaternion.RotateTowards(data._transform.rotation, targetRotation, speed * Time.deltaTime);
+
+            PlayRotateSound();
 
             // Still rotating
             result = true;

@@ -282,7 +282,7 @@ MonoBehaviour:
   aiMoveSpeed: 2.5
   aiStartingHealth: 10
   aiRotateSpeed: 120
-  enemyCount: 4
+  enemiesPerRound: 4
   playerMoveSpeed: 3
   playerStartingHealth: 15
   playerRotateSpeed: 180

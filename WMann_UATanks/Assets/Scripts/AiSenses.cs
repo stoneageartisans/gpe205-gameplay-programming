@@ -18,9 +18,12 @@ public class AiSenses : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.name.ToLower().Contains("player"))
+        if(collision != null)
         {
-            aiController.TargetWasDetected();
+            if(collision.name.ToLower().Contains("player"))
+            {
+                aiController.TargetWasDetected();
+            }
         }
     }
 }

@@ -2,6 +2,9 @@
 
 public class Missile : MonoBehaviour
 {
+    public GameObject explosionPrefab;
+    public Transform warhead;
+
     public float lifetime = 3;
     public int maxDamage = 7;
     public int minDamage = 3;
@@ -28,6 +31,11 @@ public class Missile : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
+        // Create explosion
+        GameObject explosion = Instantiate(explosionPrefab);
+        explosion.transform.position = warhead.position;
+        Destroy(explosion, 0.5f);
+
         // Destroy the missile
         Destroy(gameObject);
 
